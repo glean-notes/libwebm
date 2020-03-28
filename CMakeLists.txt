@@ -364,6 +364,7 @@ if (ENABLE_WEBM_PARSER)
   add_executable(webm_parser_demo ${webm_parser_demo_sources})
   target_link_libraries(webm_parser_demo LINK_PUBLIC webm)
 
+  set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY TRUE)
   install(TARGETS webm
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
