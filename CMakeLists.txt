@@ -11,12 +11,6 @@ project(LIBWEBM CXX)
 include(GNUInstallDirs)
 include("${CMAKE_CURRENT_SOURCE_DIR}/build/cxx_flags.cmake")
 
-if (NOT BUILD_SHARED_LIBS)
-  include("${CMAKE_CURRENT_SOURCE_DIR}/build/msvc_runtime.cmake")
-endif ()
-
-set(LIBWEBM_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-
 # Build/test configuration flags.
 option(ENABLE_WEBMTS "Enables WebM PES/TS support." ON)
 option(ENABLE_WEBMINFO "Enables building webm_info." ON)
@@ -24,6 +18,20 @@ option(ENABLE_TESTS "Enables tests." OFF)
 option(ENABLE_IWYU "Enables include-what-you-use support." OFF)
 option(ENABLE_WERROR "Enable warnings as errors." OFF)
 option(ENABLE_WEBM_PARSER "Enables new parser API." OFF)
+
+if(APPLE)
+  option(BUILD_FRAMEWORK "Build Framework bundle for Apple systems" OFF)
+endif()
+
+if(BUILD_FRAMEWORK)
+  set(BUILD_SHARED_LIBS ON)
+endif()
+
+if (NOT BUILD_SHARED_LIBS)
+  include("${CMAKE_CURRENT_SOURCE_DIR}/build/msvc_runtime.cmake")
+endif ()
+
+set(LIBWEBM_SRC_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 if(WIN32)
   require_cxx_flag_nomsvc("-std=gnu++11")
@@ -328,6 +336,17 @@ add_library(webvtt_common OBJECT ${webvtt_common_sources})
 add_library(webm ${libwebm_common_sources}
             $<TARGET_OBJECTS:mkvmuxer>
             $<TARGET_OBJECTS:mkvparser>)
+
+if(BUILD_FRAMEWORK)
+  set_target_properties(webm PROPERTIES
+    FRAMEWORK TRUE
+    FRAMEWORK_VERSION ${PROJECT_VERSION}
+    MACOSX_FRAMEWORK_IDENTIFIER org.webmproject.webm
+    MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${PROJECT_VERSION}
+    MACOSX_FRAMEWORK_BUNDLE_VERSION ${PROJECT_VERSION}
+    XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
+    OUTPUT_NAME Webm)
+endif()
 
 if (WIN32)
   # Use libwebm and libwebm.lib for project and library name on Windows (instead
