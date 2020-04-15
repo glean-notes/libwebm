@@ -19,13 +19,13 @@ option(ENABLE_IWYU "Enables include-what-you-use support." OFF)
 option(ENABLE_WERROR "Enable warnings as errors." OFF)
 option(ENABLE_WEBM_PARSER "Enables new parser API." OFF)
 
-if(APPLE)
+if (APPLE)
   option(BUILD_FRAMEWORK "Build Framework bundle for Apple systems" OFF)
-endif()
-
-if(BUILD_FRAMEWORK)
-  set(BUILD_SHARED_LIBS ON)
-endif()
+  
+  if (BUILD_FRAMEWORK)
+    set(BUILD_SHARED_LIBS ON)
+  endif ()
+endif ()
 
 if (NOT BUILD_SHARED_LIBS)
   include("${CMAKE_CURRENT_SOURCE_DIR}/build/msvc_runtime.cmake")
@@ -337,6 +337,17 @@ add_library(webm ${libwebm_common_sources}
             $<TARGET_OBJECTS:mkvmuxer>
             $<TARGET_OBJECTS:mkvparser>)
 
+if (BUILD_FRAMEWORK)
+  set_target_properties(webm PROPERTIES
+                        FRAMEWORK TRUE
+                        FRAMEWORK_VERSION ${PROJECT_VERSION}
+                        MACOSX_FRAMEWORK_IDENTIFIER org.webmproject.webm
+                        MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${PROJECT_VERSION}
+                        MACOSX_FRAMEWORK_BUNDLE_VERSION ${PROJECT_VERSION}
+                        XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
+                        OUTPUT_NAME Webm)
+endif ()
+
 if (WIN32)
   # Use libwebm and libwebm.lib for project and library name on Windows (instead
   # webm and webm.lib).
@@ -368,17 +379,6 @@ if (ENABLE_WEBM_PARSER)
   set_target_properties(webm PROPERTIES PUBLIC_HEADER
                         "${webm_parser_public_headers}")
 
-  if(BUILD_FRAMEWORK)
-    set_target_properties(webm PROPERTIES
-                          FRAMEWORK TRUE
-                          FRAMEWORK_VERSION ${PROJECT_VERSION}
-                          MACOSX_FRAMEWORK_IDENTIFIER org.webmproject.webm
-                          MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${PROJECT_VERSION}
-                          MACOSX_FRAMEWORK_BUNDLE_VERSION ${PROJECT_VERSION}
-                          XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
-                          OUTPUT_NAME Webm)
-  endif()
-
   add_executable(webm_parser_demo ${webm_parser_demo_sources})
   target_link_libraries(webm_parser_demo LINK_PUBLIC webm)
 
@@ -389,8 +389,6 @@ if (ENABLE_WEBM_PARSER)
           FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
           PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/webm)
 endif ()
-
-
 
 if (ENABLE_WEBMTS)
   add_library(webmts OBJECT ${webmts_sources})
