@@ -337,17 +337,6 @@ add_library(webm ${libwebm_common_sources}
             $<TARGET_OBJECTS:mkvmuxer>
             $<TARGET_OBJECTS:mkvparser>)
 
-if(BUILD_FRAMEWORK)
-  set_target_properties(webm PROPERTIES
-    FRAMEWORK TRUE
-    FRAMEWORK_VERSION ${PROJECT_VERSION}
-    MACOSX_FRAMEWORK_IDENTIFIER org.webmproject.webm
-    MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${PROJECT_VERSION}
-    MACOSX_FRAMEWORK_BUNDLE_VERSION ${PROJECT_VERSION}
-    XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
-    OUTPUT_NAME Webm)
-endif()
-
 if (WIN32)
   # Use libwebm and libwebm.lib for project and library name on Windows (instead
   # webm and webm.lib).
@@ -375,10 +364,20 @@ endif ()
 
 if (ENABLE_WEBM_PARSER)
   include_directories(webm_parser webm_parser/include)
-  add_library(webm_parser OBJECT ${webm_parser_sources})
-  target_sources(webm PUBLIC $<TARGET_OBJECTS:webm_parser>)
+  target_sources(webm PUBLIC ${webm_parser_sources})
   set_target_properties(webm PROPERTIES PUBLIC_HEADER
                         "${webm_parser_public_headers}")
+
+  if(BUILD_FRAMEWORK)
+    set_target_properties(webm PROPERTIES
+                          FRAMEWORK TRUE
+                          FRAMEWORK_VERSION ${PROJECT_VERSION}
+                          MACOSX_FRAMEWORK_IDENTIFIER org.webmproject.webm
+                          MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${PROJECT_VERSION}
+                          MACOSX_FRAMEWORK_BUNDLE_VERSION ${PROJECT_VERSION}
+                          XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
+                          OUTPUT_NAME Webm)
+  endif()
 
   add_executable(webm_parser_demo ${webm_parser_demo_sources})
   target_link_libraries(webm_parser_demo LINK_PUBLIC webm)
@@ -387,8 +386,11 @@ if (ENABLE_WEBM_PARSER)
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+          FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
           PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/webm)
 endif ()
+
+
 
 if (ENABLE_WEBMTS)
   add_library(webmts OBJECT ${webmts_sources})
