@@ -19,13 +19,13 @@ option(ENABLE_IWYU "Enables include-what-you-use support." OFF)
 option(ENABLE_WERROR "Enable warnings as errors." OFF)
 option(ENABLE_WEBM_PARSER "Enables new parser API." OFF)
 
-if(APPLE)
+if (APPLE)
   option(BUILD_FRAMEWORK "Build Framework bundle for Apple systems" OFF)
-endif()
-
-if(BUILD_FRAMEWORK)
-  set(BUILD_SHARED_LIBS ON)
-endif()
+  
+  if (BUILD_FRAMEWORK)
+    set(BUILD_SHARED_LIBS ON)
+  endif ()
+endif ()
 
 if (NOT BUILD_SHARED_LIBS)
   include("${CMAKE_CURRENT_SOURCE_DIR}/build/msvc_runtime.cmake")
@@ -337,16 +337,16 @@ add_library(webm ${libwebm_common_sources}
             $<TARGET_OBJECTS:mkvmuxer>
             $<TARGET_OBJECTS:mkvparser>)
 
-if(BUILD_FRAMEWORK)
+if (BUILD_FRAMEWORK)
   set_target_properties(webm PROPERTIES
-    FRAMEWORK TRUE
-    FRAMEWORK_VERSION ${PROJECT_VERSION}
-    MACOSX_FRAMEWORK_IDENTIFIER org.webmproject.webm
-    MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${PROJECT_VERSION}
-    MACOSX_FRAMEWORK_BUNDLE_VERSION ${PROJECT_VERSION}
-    XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
-    OUTPUT_NAME Webm)
-endif()
+                        FRAMEWORK TRUE
+                        FRAMEWORK_VERSION ${PROJECT_VERSION}
+                        MACOSX_FRAMEWORK_IDENTIFIER org.webmproject.webm
+                        MACOSX_FRAMEWORK_SHORT_VERSION_STRING ${PROJECT_VERSION}
+                        MACOSX_FRAMEWORK_BUNDLE_VERSION ${PROJECT_VERSION}
+                        XCODE_ATTRIBUTE_INSTALL_PATH "@rpath"
+                        OUTPUT_NAME Webm)
+endif ()
 
 if (WIN32)
   # Use libwebm and libwebm.lib for project and library name on Windows (instead
@@ -375,8 +375,7 @@ endif ()
 
 if (ENABLE_WEBM_PARSER)
   include_directories(webm_parser webm_parser/include)
-  add_library(webm_parser OBJECT ${webm_parser_sources})
-  target_sources(webm PUBLIC $<TARGET_OBJECTS:webm_parser>)
+  target_sources(webm PUBLIC ${webm_parser_sources})
   set_target_properties(webm PROPERTIES PUBLIC_HEADER
                         "${webm_parser_public_headers}")
 
@@ -388,6 +387,7 @@ if (ENABLE_WEBM_PARSER)
           ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
           LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
           RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+          FRAMEWORK DESTINATION ${CMAKE_INSTALL_PREFIX}
           PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/webm)
 endif ()
 
