@@ -6,7 +6,7 @@
 ##  in the file PATENTS.  All contributing project authors may
 ##  be found in the AUTHORS file in the root of the source tree.
 cmake_minimum_required(VERSION 3.2)
-project(LIBWEBM LANGUAGES CXX VERSION 1.0.0.27)
+project(LIBWEBM LANGUAGES CXX VERSION 1.0.0)
 
 include(GNUInstallDirs)
 include("${CMAKE_CURRENT_SOURCE_DIR}/build/cxx_flags.cmake")
